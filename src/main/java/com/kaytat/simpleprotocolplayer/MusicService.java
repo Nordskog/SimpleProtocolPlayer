@@ -120,7 +120,11 @@ public class MusicService extends Service implements MusicFocusable {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
         if (action.equals(ACTION_PLAY)) {
-            processPlayRequest(intent);
+            if (mState == State.Playing) {
+                processStopRequest();
+            } else {
+                processPlayRequest(intent);
+            }
         }
         else if (action.equals(ACTION_STOP)) {
             processStopRequest();
@@ -193,25 +197,26 @@ public class MusicService extends Service implements MusicFocusable {
      * Reconfigures AudioTrack according to audio focus settings and starts/restarts it.
      */
     void configVolume() {
-        if (mAudioFocus == AudioFocus.NoFocusNoDuck) {
-            // If we don't have audio focus and can't duck, we have to pause, even if mState
-            // is State.Playing. But we stay in the Playing state so that we know we have to resume
-            // playback once we get the focus back.
-            if (mState == State.Playing) {
-                processStopRequest();
-            }
+        // if (mAudioFocus == AudioFocus.NoFocusNoDuck) {
+        //     // If we don't have audio focus and can't duck, we have to pause, even if mState
+        //     // is State.Playing. But we stay in the Playing state so that we know we have to resume
+        //     // playback once we get the focus back.
+        //     if (mState == State.Playing) {
+        //         processStopRequest();
+        //     }
 
-            return;
-        }
+        //     return;
+        // }
 
         for (WorkerThreadPair it : workers) {
-            if (mAudioFocus == AudioFocus.NoFocusCanDuck) {
-                it.mTrack.setStereoVolume(DUCK_VOLUME, DUCK_VOLUME); // we'll be
-                                                                     // relatively
-                                                                     // quiet
-            } else {
-                it.mTrack.setStereoVolume(1.0f, 1.0f); // we can be loud
-            }
+            it.mTrack.setStereoVolume(1.0f, 1.0f); // we can be loud
+            // if (mAudioFocus == AudioFocus.NoFocusCanDuck) {
+            //     it.mTrack.setStereoVolume(DUCK_VOLUME, DUCK_VOLUME); // we'll be
+            //                                                          // relatively
+            //                                                          // quiet
+            // } else {
+            //     it.mTrack.setStereoVolume(1.0f, 1.0f); // we can be loud
+            // }
         }
     }
 
