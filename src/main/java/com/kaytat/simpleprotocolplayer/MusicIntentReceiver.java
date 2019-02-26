@@ -31,6 +31,7 @@ import android.util.Log;
  */
 public class MusicIntentReceiver extends BroadcastReceiver {
     static final String TAG = "MusicIntentReceiver";
+    public static final String ACTION_START = "com.kaytat.simpleprotocolplayer.action.START";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -50,6 +51,8 @@ public class MusicIntentReceiver extends BroadcastReceiver {
                     context.startService(new Intent(MusicService.ACTION_STOP));
                     break;
             }
+        } else if (intent.getAction().equals(ACTION_START)) {
+            MusicService.start(context, intent);
         }
     }
 }

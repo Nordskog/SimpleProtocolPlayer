@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.IBinder;
+import android.os.Build;
 import android.util.Log;
 
 /**
@@ -95,6 +96,13 @@ public class MusicService extends Service implements MusicFocusable {
     final int NOTIFICATION_ID = 1;
 
     Notification mNotification = null;
+
+    public static void start(Context context, Intent i) {
+        Intent intent = new Intent(context, MusicService.class);
+        intent.setAction(ACTION_PLAY);
+        intent.putExtra(DATA_IP_ADDRESS, i.getStringExtra(DATA_IP_ADDRESS));
+        context.startForegroundService(intent);
+    }
 
     @Override
     public void onCreate() {
@@ -254,12 +262,13 @@ public class MusicService extends Service implements MusicFocusable {
         PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
-        mNotification = new Notification();
-        mNotification.tickerText = text;
-        mNotification.icon = R.drawable.ic_stat_playing;
-        mNotification.flags |= Notification.FLAG_ONGOING_EVENT;
-        mNotification.setLatestEventInfo(getApplicationContext(), "SimpleProtocolPlayer",
-                text, pi);
+
+        Notification.Builder builder = new Notification.Builder(getApplicationContext())
+            .setSmallIcon(R.drawable.ic_stat_playing)
+            .setContentTitle("SimpleProtocolPlayer")
+            .setContentText(text)
+            .setContentIntent(pi);
+        mNotification = builder.build();
         startForeground(NOTIFICATION_ID, mNotification);
     }
 

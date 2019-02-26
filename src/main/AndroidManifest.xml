@@ -33,15 +33,15 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_title" >
-        <activity
-            android:name="com.kaytat.simpleprotocolplayer.MainActivity"
-            android:label="@string/app_title"
-            android:theme="@style/theme_light">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <!-- <activity -->
+        <!--     android:name="com.kaytat.simpleprotocolplayer.MainActivity" -->
+        <!--     android:label="@string/app_title" -->
+        <!--     android:theme="@style/theme_light"> -->
+        <!--     <intent-filter> -->
+        <!--         <action android:name="android.intent.action.MAIN" /> -->
+        <!--         <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!--     </intent-filter> -->
+        <!-- </activity> -->
 
         <activity
             android:name="com.kaytat.simpleprotocolplayer.NoticeActivity"
@@ -51,6 +51,7 @@
 
         <service
             android:name="com.kaytat.simpleprotocolplayer.MusicService"
+            android:enabled="true"
             android:exported="true" >
             <intent-filter>
                 <action android:name="com.kaytat.simpleprotocolplayer.action.PLAY" />
@@ -64,6 +65,9 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.kaytat.simpleprotocolplayer.action.START" />
             </intent-filter>
         </receiver>
 
