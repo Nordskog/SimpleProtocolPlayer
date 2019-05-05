@@ -20,6 +20,8 @@ package com.kaytat.simpleprotocolplayer;
 import java.util.ArrayList;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -29,6 +31,9 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.IBinder;
 import android.os.Build;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * Service that handles media playback. This is the Service through which we perform all the media
@@ -95,13 +100,30 @@ public class MusicService extends Service implements MusicFocusable {
     // notification area).
     final int NOTIFICATION_ID = 1;
 
+    final String NOTIFICATION_CHANNEL_ID = "MUSIC_SERVICE";
+
     Notification mNotification = null;
 
-    public static void start(Context context, Intent i) {
+    private void registerNotificationChannel()
+	{
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+		{
+			NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
+					"Music Service", NotificationManager.IMPORTANCE_DEFAULT);	// TODO use string resource
+			notificationChannel.setShowBadge(false);
+			notificationChannel.setSound(null, null);
+			notificationManager.createNotificationChannel(notificationChannel);
+		}
+	}
+
+    public static void start(Context context, Intent i)
+	{
         Intent intent = new Intent(context, MusicService.class);
         intent.setAction(ACTION_PLAY);
         intent.putExtra(DATA_IP_ADDRESS, i.getStringExtra(DATA_IP_ADDRESS));
-        context.startForegroundService(intent);
+        ContextCompat.startForegroundService(context, intent);
     }
 
     @Override
@@ -109,7 +131,7 @@ public class MusicService extends Service implements MusicFocusable {
         Log.i(TAG, "Creating service");
 
         // Create the Wifi lock (this does not acquire the lock, this just creates it)
-        mWifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
+        mWifiLock = ((WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, "mylock");
 
         // create the Audio Focus Helper, if the Audio Focus feature is available (SDK 8 or above)
@@ -263,12 +285,16 @@ public class MusicService extends Service implements MusicFocusable {
                 new Intent(getApplicationContext(), MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification.Builder builder = new Notification.Builder(getApplicationContext())
+		registerNotificationChannel();
+
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_playing)
             .setContentTitle("SimpleProtocolPlayer")
             .setContentText(text)
             .setContentIntent(pi);
+
         mNotification = builder.build();
+
         startForeground(NOTIFICATION_ID, mNotification);
     }
 

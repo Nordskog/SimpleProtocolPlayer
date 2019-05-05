@@ -2,13 +2,15 @@ apply plugin: 'com.android.application'
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.2'
+        classpath 'com.android.tools.build:gradle:3.4.0'
     }
 }
 allprojects {
     repositories {
+        google()
         jcenter()
     }
 }
@@ -35,4 +37,6 @@ android {
 }
 
 dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.0.2'
 }
